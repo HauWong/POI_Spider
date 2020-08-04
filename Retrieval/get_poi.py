@@ -11,6 +11,7 @@ import Retrieval.poi as poi
 import Retrieval.ip_agent as ip_agent
 
 ip_pool = 'https://www.kuaidaili.com/free/inha'
+# TODO: 修改i高德地图开发者Key
 api_key_list = ['a725234836f057fc777e441dffc06bc7', 'd77bd65d7a8b0ede40e8060b7ec410d7',
                 '4c38edf1344aa853060b7f930be5e7c3', 'be0370dd7d6056803bc8c64d901cfd0d',
                 '331fd8655d481098466ddeb5f0161276']
@@ -24,7 +25,7 @@ shopping = ['商场|便民商店|超级市场', '家电电子卖场|花鸟鱼虫
 life = ['旅行社', '物流速递', '电讯营业厅', '人才市场', '美容美发店|洗浴推拿场所', '事务所']
 sport = ['运动场馆', '娱乐场所', '休闲场所', '影剧院', '度假疗养所']
 medical = ['综合医院', '专科医院|动物医疗场所', '诊所', '急救中心|疾病预防机构', '医药保健销售店']
-hotel = ['四星级宾馆|五星级宾馆|六星级及以上宾馆', '三星级宾馆', '经济型连锁酒店', '旅馆招待所']
+hotel = ['四星级宾馆|五星级宾馆|奢华宾馆', '三星级宾馆', '经济型连锁酒店', '旅馆招待所', '青年旅舍']
 scene = ['公园广场', '风景名胜']
 house = ['产业园区', '商务写字楼|工业大厦建筑物', '商住两用楼宇', '别墅', '住宅小区', '宿舍', '社区中心']
 government = ['政府机关|外国机构', '民主党派|社会团体', '公检法机构|交通车辆管理|工商税务机构']
@@ -65,6 +66,27 @@ def flatten_locs(regions_dict):
     return res_ls
 
 
+def generate_locs(rect_loc, num_grid):
+
+    """将目标区域分成几块，得到所有块的范围坐标字符串列表"""
+
+    res = []
+    nw_lon, nw_lat, se_lon, se_lat = rect_loc
+    lon_gap = (se_lon - nw_lon)/num_grid[0]
+    lat_gap = (nw_lat - se_lat)/num_grid[1]
+    cur_nw_lon = nw_lon
+    cur_nw_lat = nw_lat
+    for r in range(num_grid[1]):
+        for c in range(num_grid[0]):
+            res.append('%.6f,%.6f|%.6f,%.6f|%.6f,%.6f|%.6f,%.6f|%.6f,%.6f' % \
+                       (cur_nw_lon+c*lon_gap, cur_nw_lat-r*lat_gap,
+                        cur_nw_lon+(c+1)*lon_gap, cur_nw_lat-r*lat_gap,
+                        cur_nw_lon+(c+1)*lon_gap, cur_nw_lat-(r+1)*lat_gap,
+                        cur_nw_lon+c*lon_gap, cur_nw_lat-(r+1)*lat_gap,
+                        cur_nw_lon+c*lon_gap, cur_nw_lat-r*lat_gap))
+    return res
+
+
 def start_retrieval(plg_loc_str, par_path, ip_page_index):
 
     """获取一块区域的POI"""
@@ -85,9 +107,10 @@ def start_retrieval(plg_loc_str, par_path, ip_page_index):
             p.gaode_search()
             p.save_append(file_path, type_idx)
 
-
+# ---------------------------------------Start-------------------------------------------
 print('保存POI类型 ...')
 save_list = []
+# TODO: 修改POI类型保存路径
 poi_type_save_path = r'D:\Documents\Study\Python\Self_Supervision\data\poi_types.txt'
 with open(poi_type_save_path, 'w') as f:
     for w_type in all_types:
@@ -104,23 +127,24 @@ with open(locations_path, 'r') as loc_f:
     js = loc_f.read()
     r_dict = json.loads(js)
     print(r_dict)
-# locations_ls = flatten_locs(r_dict)
+locations_ls = flatten_locs(r_dict)
+
+# r_dict = {'1': generate_locs([116.199, 40.024, 116.555, 39.753], (4, 4))}
+# locations_ls = r_dict['1']
 
 print('开始获取数据 ... ')
-# TODO: 修改文件序号
 ip_idx = 1
 region_name_list = list(r_dict.keys())
 for k in range(0, len(region_name_list)):
     region_name = region_name_list[k]
 
     # 针对多边形文件
-    locations_ls = r_dict[region_name]
     num = len(locations_ls)
     for i in range(1, num+1):
         print(i)
         locs_str = locations_ls[i-1]
         # TODO: 修改POI保存路径，保证为空文件夹
-        path = os.path.join(r'D:\Documents\Study\Python\Self_Supervision\data\shijiazhuang\test_pois', region_name, '%04d' % i)
+        path = os.path.join(r'D:\Documents\Study\Python\Data_Model\data\beijing\POI\hotel', region_name, '%04d' % i)
         folder = os.path.exists(path)
         if not folder:
             os.makedirs(path)

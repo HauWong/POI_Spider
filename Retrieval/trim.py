@@ -48,6 +48,8 @@ def merge_multi_poi(dir_path):
             print('\t%s' % s)
             new_ws = total_wb.create_sheet(title='%s_%s' % (poi_type, s))
             old_ws = cur_wb[s]
+            if old_ws.max_row <= 1:
+                continue
             for row in old_ws.rows:
                 new_ws.append(row)
     total_file_name = os.path.join(dir_path, 'total.xlsx')
@@ -83,6 +85,6 @@ def merge_multi_region(dir_path):
 
 
 if __name__ == '__main__':
-    path = r'D:\Documents\Study\Python\Self_Supervision\data\shijiazhuang\regular_pois'
-    merge_multi_region(path)
-
+    path = r'D:\Documents\Study\Python\Data_Model\data\FuncZ\POIs'
+    # merge_multi_region(path)
+    merge_multi_poi(path)

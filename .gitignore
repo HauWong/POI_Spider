@@ -2,3 +2,6 @@
 /.tmp.drivedownload/
 /.idea/
 /Retrieval/data/
+/Retrieval/__pycache__/
+/assistants/
+baidu_street_view.py

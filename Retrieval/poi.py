@@ -76,7 +76,7 @@ class Poi(object):
     def gaode_urls(self):
         urls = []
         self.coord_trans()
-        for page in range(1, 40):
+        for page in range(1, 50):
             url = 'http://restapi.amap.com/v3/place/polygon?'\
                   'key=%s&polygon=%s&types=%s&offset=%d&page=%d&extensions=all&output=json'\
                   % (self.key, self.plg, self.types, 25, page)
@@ -85,8 +85,10 @@ class Poi(object):
 
     def gaode_search(self):
         self.generate_opener()
-        uncompleted_status = True
-        for url in self.gaode_urls():
+        urls = self.gaode_urls()
+        for url in urls:
+            uncompleted_status = True
+            print(url)
             while uncompleted_status:
                 try:
                     response = request.urlopen(url)
@@ -96,6 +98,7 @@ class Poi(object):
                     if chardet.detect(html)['encoding'] != 'utf-8':
                         html = html.decode('utf-8')
                     data = json.loads(html)
+                    print(data['status'], data['count'])
                     if data['status'] == '0':
                         continue
                     if data['count'] == '0':
@@ -112,6 +115,7 @@ class Poi(object):
                     self.generate_opener()
 
     def save_append(self, path, sheet_idx):
+        print(len(self.poi_list))
         if len(self.poi_list) == 0:
             print('No poi saved')
             return

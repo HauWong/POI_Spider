@@ -15,6 +15,7 @@ ip_pool = 'https://www.kuaidaili.com/free/inha'
 api_key_list = ['a725234836f057fc777e441dffc06bc7', 'd77bd65d7a8b0ede40e8060b7ec410d7',
                 '4c38edf1344aa853060b7f930be5e7c3', 'be0370dd7d6056803bc8c64d901cfd0d',
                 '331fd8655d481098466ddeb5f0161276']
+# 上述Key已失效，用户可前往高德开放平台(https://lbs.amap.com/)自行申请。 ----2020.12.14 16:28
 
 # 原始POI类型
 motor = ['加油站|加气站|其他能源站', '汽车养护|洗车场|汽车俱乐部|汽车救援|汽车配件销售|汽车租赁|二手车交易',
